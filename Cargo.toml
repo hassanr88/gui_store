@@ -1,0 +1,12 @@
+[package]
+name = "gui_store"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+macroquad = "0.4.16"
+image = "0.25.10"   
+
+[features]
+scale = []
+default = []
