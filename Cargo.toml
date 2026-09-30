@@ -10,3 +10,6 @@ image = "0.25.10"
 [features]
 scale = []
 default = []
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+arboard = { version = "3.6", features = ["wayland-data-control"] }
