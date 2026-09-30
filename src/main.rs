@@ -101,17 +101,17 @@ async fn main() {
     let mut bread_total = 0.0;
     btn_calc.with_text_color(BLACK);
     btn_change.with_text_color(BLACK);
-    btn_restart.with_text_color(BLACK).with_hover_text_color(WHITE);
+    btn_restart.with_text_color(BLACK).with_hover_text_color(WHITE).enabled=false;
     btn_exit.with_text_color(BLACK).with_hover_text_color(WHITE);
     txt_input.set_max_chars(10);
     txt_input.set_allowed_chars("0123456789.");
     txt_input.set_enabled(false);
-    txt_input.set_prompt("Input given $").set_allowed_chars("0123456789");
-    txt_bread.set_prompt("Input # of Bread").set_allowed_chars("0123456789");
-    txt_milk.set_prompt("Input # of Milk").set_allowed_chars("0123456789");
-    txt_chips.set_prompt("Input # of Chips").set_allowed_chars("0123456789");
-    txt_cookie.set_prompt("Input # of Cookie").set_allowed_chars("0123456789");
-    txt_cream.set_prompt("Input # of Cream").set_allowed_chars("0123456789");
+    txt_input.set_prompt("Input given $").set_allowed_chars("0123456789.").set_max_chars(16);
+    txt_bread.set_prompt("Input # of Bread").set_allowed_chars("0123456789").set_max_chars(16);
+    txt_milk.set_prompt("Input # of Milk").set_allowed_chars("0123456789").set_max_chars(16);
+    txt_chips.set_prompt("Input # of Chips").set_allowed_chars("0123456789").set_max_chars(16);
+    txt_cookie.set_prompt("Input # of Cookie").set_allowed_chars("0123456789").set_max_chars(16);
+    txt_cream.set_prompt("Input # of Cream").set_allowed_chars("0123456789").set_max_chars(16);
     btn_change.enabled=false;
     loop {
         clear_background(WHITE);
@@ -130,16 +130,33 @@ async fn main() {
             txt_input.set_enabled(false);
             btn_change.enabled=false;
             btn_calc.enabled = true;
+            txt_bread.set_enabled(true);
+            txt_milk.set_enabled(true);
+            txt_chips.set_enabled(true);
+            txt_cookie.set_enabled(true);
+            txt_cream.set_enabled(true);
+            btn_restart.enabled=false;
         }
         if btn_calc.click() {
-            if milk_total == 0.0 && chips_total == 0.0 && cookie_total == 0.0 && cream_total == 0.0 && bread_total == 0.0 {
-                lbl_out.set_text("Cart is empty. Please add items.");
+            bread_total = txt_bread.get_text().parse::<f32>().unwrap_or(0.0) * 2.50;
+            milk_total = txt_milk.get_text().parse::<f32>().unwrap_or(0.0) * 3.00;
+            chips_total = txt_chips.get_text().parse::<f32>().unwrap_or(0.0) * 1.75;
+            cookie_total = txt_cookie.get_text().parse::<f32>().unwrap_or(0.0) * 2.00;
+            cream_total = txt_cream.get_text().parse::<f32>().unwrap_or(0.0) * 4.00;
+            total_cost = bread_total +  milk_total + chips_total + cookie_total + cream_total;
+            if total_cost == 0.0 {
+                lbl_out.set_text("Please select at least one item to calculate the total cost.");
             } else {
-                total_cost = (milk_total * 2.99) + (chips_total * 3.50) + (cookie_total * 0.50) + (cream_total * 4.25) + (bread_total * 2.25);
                 lbl_out.set_text(&format!("Total Cost: ${:.2}", total_cost));
-                txt_input.set_enabled(true);
-                btn_change.enabled=true;
-                btn_calc.enabled = false;
+            txt_input.set_enabled(true);
+            btn_change.enabled=true;
+            txt_bread.set_enabled(false);
+            txt_milk.set_enabled(false);
+            txt_chips.set_enabled(false);
+            txt_cookie.set_enabled(false);
+            txt_cream.set_enabled(false);
+            btn_calc.enabled=false;
+            btn_restart.enabled=true;
             }
         }
         if btn_change.click() {
@@ -148,10 +165,13 @@ async fn main() {
                 let change = total_cost - given_amount;
                 if change < 0.0 {
                     lbl_out.set_text(&format!("Change to give: ${:.2}", -change));
+                    btn_change.enabled=false;
                 } else if change == 0.0 {
                     lbl_out.set_text("No change to give.");
+                    btn_change.enabled=false;
                 } else {
                     lbl_out.set_text(&format!("Amount still owed: ${:.2}", change));
+                    btn_change.enabled=false;
                 }
             } else {
                 lbl_out.set_text("Invalid input for given amount.");
